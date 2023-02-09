@@ -85,6 +85,7 @@
         createApp({
             data() {
                 return {
+                    db:'',
                     accion:'nuevo',
                     buscar: '',
                     docentes: [],
@@ -131,9 +132,25 @@
                 listarDocentes(){
                     this.docentes = JSON.parse( localStorage.getItem('docentes') || "[]" )
                         .filter(docente=>docente.nombre.toLowerCase().indexOf(this.buscar.toLowerCase())>-1);
-                }
+                },
+                abrirBD(){
+                    let indexedDB = indexedDB.open('db_sistema_academico',1);
+                    indexedDB.onupgradeneeded=e=>{
+                        let req = e.target.result,
+                            tbldocente = req.createObjectStore('tbldocentes', {keyPath:'idDocente'});
+                        tbldocente.createIndex('idDocente', 'idDocente', {unique:true});
+                        tbldocente.createIndex('codigo','codigo', {unique:true});
+                    };
+                    indexedDB.onsuccess= e=>{
+                        this.db = e.target.result;
+                    };
+                    indexedDB.onerror= e=>{
+                        console.error( e );
+                    };
+                },
             },
             created(){
+                this.abrirBD();
                 this.listarDocentes();
             }
         }).mount('#app');
