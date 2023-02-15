@@ -98,25 +98,21 @@
             },
             methods:{
                 guardarDocente(){
-                    this.listarDocentes();
+                    let store = this.abrirStore('tbldocentes', 'readwrite');
                     if(this.accion==='nuevo'){
                         this.docente.idDocente = new Date().getTime().toString(16);
-                        this.docentes.push( JSON.parse( JSON.stringify(this.docente) ) );
-                    }else if(this.accion==='modificar'){
-                        let index = this.docentes.findIndex(docente=>docente.idDocente==this.docente.idDocente);
-                        this.docentes[index] = JSON.parse( JSON.stringify(this.docente) );
-                    }else if(this.accion==='eliminar'){
-                        let index = this.docentes.findIndex(docente=>docente.idDocente==this.docente.idDocente);
-                        this.docentes.splice(index,1);
                     }
-                    localStorage.setItem("docentes", JSON.stringify(this.docentes) );
+                    store.put( JSON.parse(JSON.stringify(this.docente) ) );
+                    this.listarDocentes();
                     this.nuevoDocente();
                 },
                 eliminarDocente(docente){
                     if( confirm(`Esta seguro de eliminar a ${docente.nombre}?`) ){
-                        this.accion='eliminar';
-                        this.docente=docente;
-                        this.guardarDocente();
+                        let store = this.abrirStore('tbldocentes', 'readwrite'),
+                            req = store.delete(docente.idDocente);
+                        req.onsuccess = resp=>{
+                            this.listarDocentes();
+                        };
                     }
                 },
                 nuevoDocente(){
@@ -130,28 +126,41 @@
                     this.docente = docente;
                 },
                 listarDocentes(){
-                    this.docentes = JSON.parse( localStorage.getItem('docentes') || "[]" )
-                        .filter(docente=>docente.nombre.toLowerCase().indexOf(this.buscar.toLowerCase())>-1);
+                    let store = this.abrirStore('tbldocentes', 'readonly'),
+                        data = store.getAll();
+                    data.onsuccess = resp=>{
+                        this.docentes = data.result
+                            .filter(docente=>docente.nombre.toLowerCase().indexOf(this.buscar.toLowerCase())>-1 ||
+                                docente.codigo.indexOf(this.buscar)>-1);
+                    };
+                },
+                abrirStore(store, modo){
+                    let tx = this.db.transaction(store, modo); //modo = readonly || writeonly
+                    return tx.objectStore(store);
                 },
                 abrirBD(){
-                    let indexedDB = indexedDB.open('db_sistema_academico',1);
-                    indexedDB.onupgradeneeded=e=>{
+                    let indexDB = indexedDB.open('db_sistema_academico',1);
+                    indexDB.onupgradeneeded=e=>{
                         let req = e.target.result,
-                            tbldocente = req.createObjectStore('tbldocentes', {keyPath:'idDocente'});
+                            tbldocente = req.createObjectStore('tbldocentes', {keyPath:'idDocente'}),
+                            tblalumno = req.createObjectStore('tblalumnos',{keyPath:'idAlumno'}),
+                            tblmateria = req.createObjectStore('tblmaterias',{keyPath:'idMateria'});
+
                         tbldocente.createIndex('idDocente', 'idDocente', {unique:true});
-                        tbldocente.createIndex('codigo','codigo', {unique:true});
+                        tblalumno.createIndex('idAlumno', 'idAlumno', {unique:true});
+                        tblmateria.createIndex('idMateria', 'idMateria', {unique:true});
                     };
-                    indexedDB.onsuccess= e=>{
+                    indexDB.onsuccess= e=>{
                         this.db = e.target.result;
+                        this.listarDocentes();
                     };
-                    indexedDB.onerror= e=>{
+                    indexDB.onerror= e=>{
                         console.error( e );
                     };
                 },
             },
             created(){
                 this.abrirBD();
-                this.listarDocentes();
             }
         }).mount('#app');
     </script>
