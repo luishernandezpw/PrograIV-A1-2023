@@ -34,5 +34,6 @@
                 <component-matriculas ref="matricula" v-show="forms['matricula'].mostrar"></component-matriculas>
             </div>
         </div>
+        @vite('resources/js/app.js')
     </body>
 </html>

@@ -1,39 +1,49 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-
 import './bootstrap';
 import { createApp } from 'vue';
+window.db = "";
 
-/**
- * Next, we will create a fresh Vue application instance. You may then begin
- * registering components with the application instance so they are ready
- * to use in your application's views. An example is included for you.
- */
+import alumno from './components/AlumnoComponent.vue';
 
-const app = createApp({});
+var app = new Vue({
+    el: "#app",
+    components:{
+        alumno,
+    },
+    data: {
+        forms:{
+            docente     : {mostrar:false},
+            alumno      : {mostrar:false},
+            materia     : {mostrar:false},
+            matricula   : {mostrar:false},
+            inscripcion : {mostrar:false},
+        }
+    },
+    methods:{
+        abrirFormulario(form){
+            this.forms[form].mostrar = !this.forms[form].mostrar;
+            this.$refs[form].listar();
+        },
+        abrirBD(){
+            let indexDB = indexedDB.open('db_sistema_academico',1);
+            indexDB.onupgradeneeded=e=>{
+                let req = e.target.result,
+                    tbldocente = req.createObjectStore('tbldocentes', {keyPath:'idDocente'}),
+                    tblalumno = req.createObjectStore('tblalumnos',{keyPath:'idAlumno'}),
+                    tblmateria = req.createObjectStore('tblmaterias',{keyPath:'idMateria'});
 
-import ExampleComponent from './components/ExampleComponent.vue';
-app.component('example-component', ExampleComponent);
-
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
-
-// Object.entries(import.meta.glob('./**/*.vue', { eager: true })).forEach(([path, definition]) => {
-//     app.component(path.split('/').pop().replace(/\.\w+$/, ''), definition.default);
-// });
-
-/**
- * Finally, we will attach the application instance to a HTML element with
- * an "id" attribute of "app". This element is included with the "auth"
- * scaffolding. Otherwise, you will need to add an element yourself.
- */
-
-app.mount('#app');
+                tbldocente.createIndex('idDocente', 'idDocente', {unique:true});
+                tblalumno.createIndex('idAlumno', 'idAlumno', {unique:true});
+                tblmateria.createIndex('idMateria', 'idMateria', {unique:true});
+            };
+            indexDB.onsuccess= e=>{
+                db = e.target.result;
+            };
+            indexDB.onerror= e=>{
+                console.error( e );
+            };
+        }, 
+    },
+    created() {
+        this.abrirBD();
+    }
+});
