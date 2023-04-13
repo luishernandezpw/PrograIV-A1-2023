@@ -4,24 +4,25 @@ window.db = "";
 
 import alumno from './components/AlumnoComponent.vue';
 
-var app = new Vue({
-    el: "#app",
+const app = createApp({
     components:{
         alumno,
     },
-    data: {
-        forms:{
-            docente     : {mostrar:false},
-            alumno      : {mostrar:false},
-            materia     : {mostrar:false},
-            matricula   : {mostrar:false},
-            inscripcion : {mostrar:false},
+    data(){
+        return {
+            forms:{
+                docente     : {mostrar:false},
+                alumno      : {mostrar:false},
+                materia     : {mostrar:false},
+                matricula   : {mostrar:false},
+                inscripcion : {mostrar:false},
+            }
         }
     },
     methods:{
         abrirFormulario(form){
             this.forms[form].mostrar = !this.forms[form].mostrar;
-            this.$refs[form].listar();
+            //this.$refs[form].listar();
         },
         abrirBD(){
             let indexDB = indexedDB.open('db_sistema_academico',1);
@@ -47,3 +48,4 @@ var app = new Vue({
         this.abrirBD();
     }
 });
+app.mount("#app");

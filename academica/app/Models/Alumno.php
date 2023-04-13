@@ -13,5 +13,8 @@ class Alumno extends Model
         'idAlumno',
         'codigo',
         'nombre',
+        'direccion',
+        'telefono',
+        'dui',
     ];
 }

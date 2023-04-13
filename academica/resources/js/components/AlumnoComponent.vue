@@ -100,6 +100,8 @@
     </div>
 </template>
 <script>
+import axios from 'axios';
+
     export default{
         props:['form'],
         data(){
@@ -118,19 +120,32 @@
             }
         },
         methods:{
-            guardarAlumno(){
+            async guardarAlumno(){
                 this.listar();
+                let method = 'POST';
                 if(this.accion==='nuevo'){
                     this.alumno.idAlumno = new Date().getTime().toString(16);
                     this.alumnos.push( JSON.parse( JSON.stringify(this.alumno) ) );
+                    method = 'POST';
                 }else if(this.accion==='modificar'){
                     let index = this.alumnos.findIndex(alumno=>alumno.idAlumno==this.alumno.idAlumno);
                     this.alumnos[index] = JSON.parse( JSON.stringify(this.alumno) );
+                    method='PUT';
                 }else if(this.accion==='eliminar'){
                     let index = this.alumnos.findIndex(alumno=>alumno.idAlumno==this.alumno.idAlumno);
                     this.alumnos.splice(index,1);
+                    method = 'DELETE';
                 }
                 localStorage.setItem("alumnos", JSON.stringify(this.alumnos) );
+                await axios({
+                    url:'/alumnos',
+                    method,
+                    data: this.alumno
+                }).then(resp=>{
+                    console.log('exito', resp);
+                }).catch(err=>{
+                    console.log('error', err);
+                });
                 this.nuevoAlumno();
             },
             eliminarAlumno(alumno){

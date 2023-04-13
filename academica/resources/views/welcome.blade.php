@@ -30,7 +30,7 @@
             <div id="appSistema">
                 <component-docentes ref="docente" v-show="forms['docente'].mostrar"></component-docentes>
                 <component-materias ref="materia" v-show="forms['materia'].mostrar"></component-materias>
-                <component-alumnos ref="alumno" v-show="forms['alumno'].mostrar"></component-alumnos>
+                <alumno ref="alumno" v-show="forms['alumno'].mostrar"></alumno>
                 <component-matriculas ref="matricula" v-show="forms['matricula'].mostrar"></component-matriculas>
             </div>
         </div>
