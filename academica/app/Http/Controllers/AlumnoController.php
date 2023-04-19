@@ -71,8 +71,16 @@ class AlumnoController extends Controller
      */
     public function update(Request $request, Alumno $alumno)
     {
-        //update alumnos set ... where id=?
-        $alumno->update($request->all());
+        //update alumnos set ... where id=? X
+        //update alumnos set ... where idAlumno=? 
+        //$alumno->update($request->all());
+        $alumno::where('idAlumno', $request['idAlumno'])->update([
+            'codigo'=>$request['codigo'],
+            'nombre'=>$request['nombre'],
+            'direccion'=>$request['direccion'],
+            'telefono'=>$request['telefono'],
+            'dui'=>$request['dui'],
+        ]);
         return response()->json(['msg'=>'ok'], 200);
     }
 
@@ -82,10 +90,12 @@ class AlumnoController extends Controller
      * @param  \App\Models\Alumno  $alumno
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Alumno $alumno)
+    public function destroy(Request $request, Alumno $alumno)
     {
-        //delete from alumnos where id=?
-        $alumno->delete();
+        //delete from alumnos where id=? X
+        //delete from alumnos where idAlumno=? 
+        //$alumno->delete();
+        $alumno::where('idAlumno', $request['idAlumno'])->delete();
         return response()->json(['msg'=>'ok'], 200);
     }
 }
