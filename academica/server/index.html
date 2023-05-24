@@ -15,7 +15,38 @@
         <input type="submit" value="Guardar">
         <input type="reset" value="Nuevo">
     </form>
+    <table id="tblUsuarios" border="1" cellspacing="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
     <script>
+        function listarUsuarios() {
+            fetch('/usuarios/listar', {method: 'get'})
+            .then(resp=>resp.json())
+            .then(resp=>{
+                let $tblUsuarios = document.querySelector('#tblUsuarios > tbody'),  
+                    filas = '';
+                resp.forEach(usuario=>{
+                    filas +=`
+                        <tr>
+                            <td>${usuario.nombre}</td>
+                            <td>${usuario.direccion}</td>
+                            <td>${usuario.telefono}</td>
+                        </tr>
+                    `;
+                });
+                $tblUsuarios.innerHTML = filas;
+            });
+        }
+        document.addEventListener('DOMContentLoaded', event=>{
+            listarUsuarios();
+        });
         frmUsuarios.addEventListener('submit', e=>{
             e.preventDefault();
 
@@ -33,6 +64,7 @@
             })
             .then(resp=>resp.json())
             .then(resp=>{
+                listarUsuarios();
                 console.log(resp);
             });
         });
