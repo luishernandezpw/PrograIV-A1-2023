@@ -35,6 +35,7 @@
                 <component-matriculas ref="matricula" v-show="forms['matricula'].mostrar"></component-matriculas>
             </div>
         </div>
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
         @vite('resources/js/app.js')
     </body>
 </html>
