@@ -1,13 +1,20 @@
 import './bootstrap';
 import { createApp } from 'vue';
 import alertifyjs from 'alertifyjs';
+window.socketio = io('http://127.0.0.1:3001');
 window.db = "";
 
 import alumno from './components/AlumnoComponent.vue';
+import chat from './components/ChatComponent.vue';
+
+socketio.on('connect', e=>{
+    console.log('Conectado');
+});
 
 const app = createApp({
     components:{
         alumno,
+        chat,
     },
     data(){
         return {
@@ -17,6 +24,7 @@ const app = createApp({
                 materia     : {mostrar:false},
                 matricula   : {mostrar:false},
                 inscripcion : {mostrar:false},
+                chat        : {mostrar:false},
             }
         }
     },

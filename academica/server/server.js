@@ -1,7 +1,13 @@
 const express = require('express'),
     server = express(),
     http = require('http').Server(server),
-    io = require('socket.io')(http),
+    io = require('socket.io')(http, {
+        allowEIO3:true,
+        cors:{
+            origin: ['http://127.0.0.1:8000', 'http://localhost:8000'],
+            credentials:true,
+        }
+    }),
     { MongoClient } = require('mongodb'),
     url = 'mongodb://127.0.0.1:27017/',
     dbname = 'chatUGB',
@@ -14,6 +20,14 @@ async function conectarBD(){
 }
 server.use(express.json());
 
+io.on('connect', socket=>{
+    console.log('server conectado...');
+
+    socket.on('chat', chat=>{
+        console.log( chat );
+        io.emit('chat', chat);
+    });
+});
 server.get('/', (req, resp)=>{
     resp.send("Hola Mundo con Express desde Nodejs");
 });
