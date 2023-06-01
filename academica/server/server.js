@@ -23,9 +23,18 @@ server.use(express.json());
 io.on('connect', socket=>{
     console.log('server conectado...');
 
-    socket.on('chat', chat=>{
-        console.log( chat );
-        io.emit('chat', chat);
+    socket.on('chat', async chat=>{
+        let db = await conectarBD(),
+            collection = db.collection('chat');
+        collection.insertOne(chat);
+        //io.emit('chat', chat); //envia a todos...
+        socket.broadcast.emit('chat', chat); //envia a los demas...
+    });
+    socket.on('historial', async ()=>{
+        let db = await conectarBD(),
+            collection = db.collection('chat'),
+            chats = await collection.find().toArray();
+        socket.emit('historial', chats);//solo a mi... 
     });
 });
 server.get('/', (req, resp)=>{

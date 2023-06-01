@@ -17,7 +17,7 @@
                         <div class="row">
                             <div class="col-10">
                                 <form id="frmChat" v-on:submit.prevent="guardarChat">
-                                    <input type="text" v-model="chat.message" @keyup.enter="guardarChat"
+                                    <input type="text" v-model="chat.message"
                                         required placeholder="Escribe aqui tu mensaje." class="form-control"/>
                                     <input type="submit" value="Enviar"/>
                                 </form>
@@ -40,7 +40,7 @@ import axios from 'axios';
             return {
                 chats:[],
                 chat:{
-                    from:'luis',
+                    from:'pedro',
                     to:'todos',
                     message:'',
                     status:'',//en espera, enviado, recibido, leido
@@ -51,12 +51,24 @@ import axios from 'axios';
         methods:{
             guardarChat(){
                 if( this.chat.message!='' ){
-                    this.chats.push(this.chat);
+                    this.chats.push({...this.chat});
                     socketio.emit('chat', this.chat);
                 }else{
                     alertifyjs.error('Por favor escriba un mensaje');
                 }
+            },
+            obtenerHistorial(){
+                socketio.emit('historial');
+                socketio.on('historial', chats=>{
+                    this.chats = chats;
+                });
             }
+        },
+        created(){
+            this.obtenerHistorial();
+            socketio.on('chat', chat=>{
+                this.chats.push(chat);
+            });
         }
     }
 </script>
